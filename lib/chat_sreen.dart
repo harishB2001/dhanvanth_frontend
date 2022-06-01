@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, prefer_const_constructors, non_constant_identifier_names, avoid_types_as_parameter_names
+// ignore_for_file: depend_on_referenced_packages, prefer_const_constructors, non_constant_identifier_names, avoid_types_as_parameter_names, avoid_print
 
 import 'package:dhanvanth/parser.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +7,8 @@ import 'dart:math';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 Parser p = Parser();
-String tunnelUrl = 'https://33df-122-178-73-215.in.ngrok.io';
-
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
 
@@ -48,9 +45,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void callBackend(String statement) async {
-    print(p.urlCreate(tunnelUrl, statement));
+    print(p.urlCreate(statement));
     http.Response response =
-        await http.get(Uri.parse(p.urlCreate(tunnelUrl, statement)));
+        await http.get(Uri.parse(p.urlCreate(statement)));
     if (response.statusCode == 200) {
       print("response received");
       Map<String, dynamic> a = json.decode(response.body);

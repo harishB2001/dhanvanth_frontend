@@ -1,3 +1,5 @@
+import 'package:dhanvanth/tunnel_link.dart';
+
 class Parser {
   Set<dynamic> possibleDiseases = {};
   Set<dynamic> allSymptoms = {};
@@ -27,7 +29,7 @@ class Parser {
     statement = a["statement"];
   }
 
-  String urlCreate(String tunnelUrl, String statement) {
+  String urlCreate(String statement) {
     this.statement = statement;
 
     String pd = possibleDiseases.join(",");
@@ -40,7 +42,7 @@ class Parser {
     String ps = previousStatement;
     String s = this.statement;
 
-    String url = tunnelUrl +
+    String url = Tunnel().tunnelUrl+
         '/?' +
         'pd=' +
         pd +
