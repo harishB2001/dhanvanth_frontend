@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, prefer_const_constructors, non_constant_identifier_names, avoid_types_as_parameter_names, avoid_print
+// ignore_for_file: depend_on_referenced_packages, prefer_const_constructors, non_constant_identifier_names, avoid_types_as_parameter_names, avoid_print, must_call_super
 
 import 'package:dhanvanth/parser.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +9,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:http/http.dart' as http;
 
 Parser p = Parser();
+
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
 
@@ -17,14 +18,24 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  List<types.Message> messages = [];
-
   final _user = const types.User(id: '06c33e8b-e835-4736-80f4-63f44b66666c');
   final _bot = const types.User(
     id: '06c33e8b-e835-4736-80f4-63f44b8888c',
     firstName: "Dhanvanth",
     lastName: "MedBot",
   );
+  List<types.Message> messages = [];
+
+  @override
+  void initState() {
+    messages.add(types.TextMessage(
+      author: _bot,
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+      id: randomString(),
+      text:
+          "Hi I'm Dhanvanth, your medical assistance\n Try telling me \n1)'What are the symptoms of Jaundice?\n2)I have high fever'",
+    ));
+  }
 
   String randomString() {
     final random = Random.secure();
@@ -46,8 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void callBackend(String statement) async {
     print(p.urlCreate(statement));
-    http.Response response =
-        await http.get(Uri.parse(p.urlCreate(statement)));
+    http.Response response = await http.get(Uri.parse(p.urlCreate(statement)));
     if (response.statusCode == 200) {
       print("response received");
       Map<String, dynamic> a = json.decode(response.body);
@@ -88,25 +98,71 @@ class _ChatScreenState extends State<ChatScreen> {
     callBackend(message.text);
   }
 
+  var micset = Colors.red;
+  bool isSpeak = false;
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Dhanvanth"),
-        ),
-        body: Chat(
-          sendButtonVisibilityMode: SendButtonVisibilityMode.always,
-          theme: DarkChatTheme(),
-          avatarBuilder: (String) => Image.asset(
-            'assets/dhanvanth.png',
-            scale: 6,
+    return Container(
+      color: Color.fromARGB(255, 43, 34, 79),
+      child: SafeArea(
+        child: Material(
+          child: Scaffold(
+            backgroundColor: Color.fromARGB(255, 43, 34, 79),
+            appBar: AppBar(
+              actions: [
+                Expanded(child: SizedBox()),
+                Expanded(
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.speaker,
+                      color: micset,
+                    ),
+                    onPressed: () {
+                      if (isSpeak) {
+                        setState(() {
+                          micset = Colors.red;
+                          isSpeak = false;
+                        });
+                      } else {
+                        setState(() {
+                          micset = Colors.green;
+                          isSpeak = true;
+                        });
+                      }
+                    },
+                  ),
+                ),
+                Expanded(child: SizedBox()),
+              ],
+              elevation: 10,
+              shadowColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(30),
+                ),
+              ),
+              backgroundColor: Color.fromARGB(255, 43, 34, 79),
+              title: Text("Medical Bot using AI"),
+            ),
+            body: GestureDetector(
+              onTap: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              child: Chat(
+                sendButtonVisibilityMode: SendButtonVisibilityMode.always,
+                theme: DarkChatTheme(),
+                avatarBuilder: (String) => Image.asset(
+                  'assets/dhanvanth.png',
+                  scale: 6,
+                ),
+                showUserAvatars: true,
+                showUserNames: true,
+                messages: messages,
+                onSendPressed: _handleSendPressed,
+                user: _user,
+              ),
+            ),
           ),
-          showUserAvatars: true,
-          showUserNames: true,
-          messages: messages,
-          onSendPressed: _handleSendPressed,
-          user: _user,
         ),
       ),
     );
