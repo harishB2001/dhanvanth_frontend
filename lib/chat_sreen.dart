@@ -7,6 +7,7 @@ import 'dart:math';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:http/http.dart' as http;
+import 'package:text_to_speech/text_to_speech.dart';
 
 Parser p = Parser();
 
@@ -24,6 +25,8 @@ class _ChatScreenState extends State<ChatScreen> {
     firstName: "Dhanvanth",
     lastName: "MedBot",
   );
+  var micset = Colors.red;
+  bool isSpeak = false;
   List<types.Message> messages = [];
 
   @override
@@ -33,7 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: randomString(),
       text:
-          "Hi I'm Dhanvanth, your medical assistance\n Try telling me \n1)'What are the symptoms of Jaundice?\n2)I have high fever'",
+          "Hi I'm Dhanvanth, your medical assistance\n Try telling me \n1) What are the symptoms of Jaundice?\n2) I have high fever'",
     ));
   }
 
@@ -43,10 +46,18 @@ class _ChatScreenState extends State<ChatScreen> {
     return base64UrlEncode(values);
   }
 
-  void _addMessage(types.Message message) {
+  void _addMessage(types.TextMessage message) {
     setState(() {
       messages.insert(0, message);
     });
+    TextToSpeech tts = TextToSpeech();
+    tts.setVolume(1.0);
+    tts.setRate(1.0);
+    tts.setPitch(1.0);
+    tts.setLanguage('en-us');
+    if (message.author == _bot && message.text != "typing..." && isSpeak) {
+      tts.speak(message.text);
+    }
   }
 
   void _removeMessage() {
@@ -98,8 +109,6 @@ class _ChatScreenState extends State<ChatScreen> {
     callBackend(message.text);
   }
 
-  var micset = Colors.red;
-  bool isSpeak = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -110,39 +119,41 @@ class _ChatScreenState extends State<ChatScreen> {
             backgroundColor: Color.fromARGB(255, 43, 34, 79),
             appBar: AppBar(
               actions: [
-                Expanded(child: SizedBox()),
-                Expanded(
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.speaker,
-                      color: micset,
-                    ),
-                    onPressed: () {
-                      if (isSpeak) {
-                        setState(() {
-                          micset = Colors.red;
-                          isSpeak = false;
-                        });
-                      } else {
-                        setState(() {
-                          micset = Colors.green;
-                          isSpeak = true;
-                        });
-                      }
-                    },
+                IconButton(
+                  icon: Icon(
+                    Icons.speaker,
+                    color: micset,
                   ),
+                  onPressed: () {
+                    if (isSpeak) {
+                      setState(() {
+                        micset = Colors.red;
+                        isSpeak = false;
+                      });
+                    } else {
+                      setState(() {
+                        micset = Colors.green;
+                        isSpeak = true;
+                      });
+                    }
+                  },
                 ),
-                Expanded(child: SizedBox()),
+                SizedBox(
+                  width: 40,
+                ),
               ],
               elevation: 10,
-              shadowColor: Colors.white,
+              shadowColor: Colors.tealAccent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(30),
                 ),
               ),
               backgroundColor: Color.fromARGB(255, 43, 34, 79),
-              title: Text("Medical Bot using AI"),
+              title: Text(
+                "Medical Bot using AI",
+                style: TextStyle(color: Colors.tealAccent),
+              ),
             ),
             body: GestureDetector(
               onTap: () {
