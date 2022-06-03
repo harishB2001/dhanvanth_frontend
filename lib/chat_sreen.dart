@@ -31,6 +31,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
+    messages.clear();
+    p = Parser();
     messages.add(types.TextMessage(
       author: _bot,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -50,12 +52,13 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       messages.insert(0, message);
     });
-    TextToSpeech tts = TextToSpeech();
-    tts.setVolume(1.0);
-    tts.setRate(1.0);
-    tts.setPitch(1.0);
-    tts.setLanguage('en-us');
+
     if (message.author == _bot && message.text != "typing..." && isSpeak) {
+      TextToSpeech tts = TextToSpeech();
+      tts.setVolume(1.0);
+      tts.setRate(1);
+      tts.setPitch(1.0);
+      tts.setLanguage('en-us');
       tts.speak(message.text);
     }
   }
@@ -70,10 +73,13 @@ class _ChatScreenState extends State<ChatScreen> {
     print(p.urlCreate(statement));
     http.Response response = await http.get(Uri.parse(p.urlCreate(statement)));
     if (response.statusCode == 200) {
-      print("response received");
+      print(response.body);
       Map<String, dynamic> a = json.decode(response.body);
       p = Parser.getInstance(a);
       _handleReceived(types.PartialText(text: p.message));
+    } else if (response.statusCode == 500) {
+      _handleReceived(types.PartialText(
+          text: "Couldn't Understand Could you rephrase the sentence"));
     }
   }
 
@@ -119,6 +125,13 @@ class _ChatScreenState extends State<ChatScreen> {
             backgroundColor: Color.fromARGB(255, 43, 34, 79),
             appBar: AppBar(
               actions: [
+                TextButton(
+                    onPressed: () {
+                      setState(() {
+                        initState();
+                      });
+                    },
+                    child: Text("Clear Chats")),
                 IconButton(
                   icon: Icon(
                     Icons.speaker,
