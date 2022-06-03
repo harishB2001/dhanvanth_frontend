@@ -1,5 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages, prefer_const_constructors, non_constant_identifier_names, avoid_types_as_parameter_names, avoid_print, must_call_super
-
 import 'package:dhanvanth/parser.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -31,6 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
+    super.initState();
     messages.clear();
     p = Parser();
     messages.add(types.TextMessage(

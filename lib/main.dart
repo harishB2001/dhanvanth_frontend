@@ -1,5 +1,3 @@
-// ignore_for_file: must_call_super
-
 import 'package:dhanvanth/chat_sreen.dart';
 import 'package:dhanvanth/tunnel_link.dart';
 import 'package:flutter/material.dart';
@@ -12,14 +10,9 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        // home: ChatScreen(),
-        debugShowCheckedModeBanner: false,
-        home: App());
+    return const MaterialApp(debugShowCheckedModeBanner: false, home: App());
   }
 }
 
@@ -32,7 +25,8 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   void func() async {
-    var options = const ScanOptions(android:AndroidOptions(useAutoFocus: true));
+    var options =
+        const ScanOptions(android: AndroidOptions(useAutoFocus: true));
     var result = await BarcodeScanner.scan(options: options);
     setState(() {
       Tunnel().tunnelUrl = result.rawContent;
@@ -41,6 +35,7 @@ class _AppState extends State<App> {
 
   @override
   void initState() {
+    super.initState();
     func();
   }
 
